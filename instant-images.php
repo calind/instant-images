@@ -7,7 +7,7 @@ Author: Darren Cooney
 Twitter: @connekthq
 Author URI: https://connekthq.com
 Text Domain: instant-images
-Version: 4.3.5
+Version: 4.3.5+ (modified by <a href="https://github.com/calind/instant-images">calind</a>)
 License: GPL
 Copyright: Darren Cooney & Connekt Media
 */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'INSTANT_IMAGES_VERSION', '4.3.5' );
+define( 'INSTANT_IMAGES_VERSION', '4.3.5+' );
 define( 'INSTANT_IMAGES_RELEASE', 'August 14, 2020' );
 
 /**
