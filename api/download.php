@@ -46,6 +46,7 @@ function instant_images_download( WP_REST_Request $request ) {
 		if ( $data ) {
 
 			$id        = $data['id']; // Image ID.
+			$metadata  = $data['metadata']; // Unsplash image metadata
 			$image_url = $data['image_url']; // Image URL.
 			$filename  = sanitize_text_field( $data['filename'] ); // The filename.
 			$title     = sanitize_text_field( $data['title'] ); // Title.
@@ -54,6 +55,7 @@ function instant_images_download( WP_REST_Request $request ) {
 			$cfilename = sanitize_title( $data['custom_filename'] ); // Custom filename.
 			$parent_id = ( $data['parent_id'] ) ? sanitize_title( $data['parent_id'] ) : 0; // Parent post ID.
 			$name      = ( ! empty( $cfilename ) ) ? $cfilename . '.jpg' : $filename; // Actual filename.
+			$name      = apply_filters( 'instant_image_filename', $name, $metadata );
 
 			// Check if remote file exists.
 			if ( ! instant_images_remote_file_exists( $image_url ) ) {
@@ -85,9 +87,9 @@ function instant_images_download( WP_REST_Request $request ) {
 
 			// Build Attachment Data Array.
 			$attachment = array(
-				'post_title'     => $title,
-				'post_excerpt'   => $caption,
-				'post_content'   => '',
+				'post_title'     => apply_filters( 'instant_image_title', $title, $metadata ),
+				'post_excerpt'   => apply_filters( 'instant_image_caption', $caption, $metadata ),
+				'post_content'   => apply_filters( 'instant_image_content', '', $metadata ),
 				'post_status'    => 'inherit',
 				'post_mime_type' => $type,
 			);
@@ -95,8 +97,14 @@ function instant_images_download( WP_REST_Request $request ) {
 			// Insert as attachment.
 			$image_id = wp_insert_attachment( $attachment, $mirror['file'], $parent_id );
 
+			// Save original image metadata
+			update_post_meta( $image_id, '_unsplash_meta', json_encode( $metadata ) );
+
 			// Add Alt Text as Post Meta.
-			update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
+			update_post_meta( $image_id, '_wp_attachment_image_alt', apply_filters( 'instant_image_alt', $alt, $metadata ) );
+
+			// Allow plugins and themes handle custom metadata
+			do_action( 'instant_image_attachment_meta', $image_id, $metadata );
 
 			// Generate Metadata.
 			$attach_data = wp_generate_attachment_metadata( $image_id, $mirror['file'] );

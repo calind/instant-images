@@ -107,6 +107,7 @@ class Photo extends React.Component {
          title : target.getAttribute('data-title'),
          alt : target.getAttribute('data-alt'),
          caption : target.getAttribute('data-caption'),
+         metadata: this.props.result,
          parent_id : instant_img_localize.parent_id
       }      
       
